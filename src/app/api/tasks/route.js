@@ -31,7 +31,6 @@ export async function DELETE(req) {
 export async function PUT(req) {
   await dbConnect();
   const { id, ...updates } = await req.json(); // Obtener el ID y el resto de los datos del cuerpo de la solicitud
-  console.log(id);
 
   const task = await Task.findByIdAndUpdate(id, updates, { new: true });
   return new Response(JSON.stringify({ success: true, data: task }), {
