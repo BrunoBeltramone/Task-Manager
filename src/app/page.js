@@ -1,4 +1,3 @@
-// app/page/page.js
 "use client";
 
 import { useState, useEffect } from "react";
@@ -17,6 +16,7 @@ export default function Home() {
     conflict: false,
     priority: "",
     tags: "",
+    date: "", // Añadir campo de fecha
   });
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function Home() {
 
   const addTask = async (e) => {
     e.preventDefault();
-    const newTask = { title, description, status, conflict, priority, tags };
+    const newTask = { title, description, status, conflict, priority, tags, date: new Date() }; // Añadir fecha actual
     try {
       await axios.post("/api/tasks", newTask);
       fetchTasks();
@@ -80,7 +80,8 @@ export default function Home() {
       (filters.status ? task.status === filters.status : true) &&
       (filters.conflict ? task.conflict === filters.conflict : true) &&
       (filters.priority ? task.priority === filters.priority : true) &&
-      (filters.tags ? task.tags.includes(filters.tags) : true)
+      (filters.tags ? task.tags.includes(filters.tags) : true) &&
+      (filters.date ? new Date(task.date).toLocaleDateString() === new Date(filters.date).toLocaleDateString() : true) // Filtrar por fecha
     );
   });
 
@@ -235,6 +236,17 @@ export default function Home() {
             placeholder="Enter tag"
           />
         </div>
+        <div className="flex items-center space-x-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Date
+          </label>
+          <input
+            type="date"
+            value={filters.date}
+            onChange={(e) => setFilters({ ...filters, date: e.target.value })}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
       </div>
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
@@ -256,6 +268,9 @@ export default function Home() {
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Tags
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Date
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
@@ -309,6 +324,9 @@ export default function Home() {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {task.tags.join(", ")}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {new Date(task.date).toLocaleDateString()}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <button
