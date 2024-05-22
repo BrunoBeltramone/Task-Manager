@@ -30,7 +30,15 @@ export default function Home() {
 
   const addTask = async (e) => {
     e.preventDefault();
-    const newTask = { title, description, status, conflict, priority, tags, date: new Date() }; // Añadir fecha actual
+    const newTask = {
+      title,
+      description,
+      status,
+      conflict,
+      priority,
+      tags,
+      date: new Date(),
+    }; // Añadir fecha actual
     try {
       await axios.post("/api/tasks", newTask);
       fetchTasks();
@@ -81,7 +89,10 @@ export default function Home() {
       (filters.conflict ? task.conflict === filters.conflict : true) &&
       (filters.priority ? task.priority === filters.priority : true) &&
       (filters.tags ? task.tags.includes(filters.tags) : true) &&
-      (filters.date ? new Date(task.date).toLocaleDateString() === new Date(filters.date).toLocaleDateString() : true) // Filtrar por fecha
+      (filters.date
+        ? new Date(task.date).toLocaleDateString() ===
+          new Date(filters.date).toLocaleDateString()
+        : true) // Filtrar por fecha
     );
   });
 
@@ -286,7 +297,7 @@ export default function Home() {
               <td className="px-6 py-4 text-sm max-w-[630px] break-words h-auto text-gray-500">
                 {task.description}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm  text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm w-[170px] text-gray-500">
                 <select
                   value={task.status}
                   onChange={async (e) => {
@@ -301,15 +312,19 @@ export default function Home() {
                 </select>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <input
-                  type="checkbox"
-                  checked={task.conflict}
-                  onChange={async (e) => {
-                    await updateTask(task._id, { conflict: e.target.checked });
-                  }}
-                />
+                <div className="flex justify-center">
+                  <input
+                    type="checkbox"
+                    checked={task.conflict}
+                    onChange={async (e) => {
+                      await updateTask(task._id, {
+                        conflict: e.target.checked,
+                      });
+                    }}
+                  />
+                </div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm w-[150px] text-gray-500">
                 <select
                   value={task.priority}
                   onChange={async (e) => {
