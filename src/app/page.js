@@ -2,18 +2,20 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("To Do");
+  const [state, setState] = useState("To Do");
   const [conflict, setConflict] = useState(false);
   const [priority, setPriority] = useState("Low");
   const [tags, setTags] = useState([]);
   const [workspace, setWorkspace] = useState("");
   const [filters, setFilters] = useState({
-    status: "",
+    state: "",
     conflict: false,
     priority: "",
     workspace: "",
@@ -22,32 +24,48 @@ export default function Home() {
   });
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (session) {
+      fetchTasks();
+    }
+  }, [session]);
 
   const fetchTasks = async () => {
-    const response = await axios.get("/api/tasks");
-    setTasks(response.data.data);
-  };
+    try {
+      const response = await axios.get("/api/tasks", session.user.id, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.accessToken}`
+        }
+      });
+      setTasks(response.data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  }
 
   const addTask = async (e) => {
     e.preventDefault();
-    const newTask = {
-      title,
-      description,
-      status,
-      workspace,
-      conflict,
-      priority,
-      tags,
-      date: new Date(),
-    }; // Añadir fecha actual
     try {
-      await axios.post("/api/tasks", newTask);
+      const newTask = {
+        title,
+        description,
+        state,
+        workspace,
+        conflict,
+        priority,
+        tags,
+        date: new Date(),
+        userId: session.user.id,
+      };
+      await axios.post("/api/tasks", newTask, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      });
       fetchTasks();
       setTitle("");
       setDescription("");
-      setStatus("To Do");
+      setState("To Do");
       setConflict(false);
       setPriority("Low");
       setTags([]);
@@ -89,7 +107,7 @@ export default function Home() {
 
   const filteredTasks = tasks.filter((task) => {
     return (
-      (filters.status ? task.status === filters.status : true) &&
+      (filters.state ? task.state === filters.state : true) &&
       (filters.conflict ? task.conflict === filters.conflict : true) &&
       (filters.priority ? task.priority === filters.priority : true) &&
       (filters.tags ? task.tags.includes(filters.tags) : true) &&
@@ -100,6 +118,9 @@ export default function Home() {
       (filters.workspace ? task.workspace === filters.workspace : true)
     );
   });
+
+  if (status === "Loading") return <div>Loading...</div>;
+  if (!session) return <div className="h-screen">You need to be authenticated to view this page.</div>;
 
   return (
     <div className="container mx-auto p-4">
@@ -129,11 +150,11 @@ export default function Home() {
         </div>
         <div className="mb-2">
           <label className="block text-sm font-medium text-gray-700">
-            Status
+            State
           </label>
           <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            value={state}
+            onChange={(e) => setState(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
             <option value="To Do">To Do</option>
@@ -212,11 +233,11 @@ export default function Home() {
         <h2 className="text-xl font-bold  flex">Filters</h2>
         <div className=" flex justify-center items-center space-x-2">
           <label className="block text-sm font-medium text-gray-700">
-            Status
+            State
           </label>
           <select
-            value={filters.status}
-            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+            value={filters.state}
+            onChange={(e) => setFilters({ ...filters, state: e.target.value })}
             className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
             <option value="">All</option>
@@ -291,7 +312,7 @@ export default function Home() {
               Description
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
+              State
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Conflict
@@ -321,9 +342,9 @@ export default function Home() {
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm w-[170px] text-gray-500">
                 <select
-                  value={task.status}
+                  value={task.state}
                   onChange={async (e) => {
-                    await updateTask(task._id, { status: e.target.value });
+                    await updateTask(task._id, { state: e.target.value });
                   }}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 >

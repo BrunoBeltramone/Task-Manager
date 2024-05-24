@@ -34,9 +34,13 @@ const TaskSchema = new mongoose.Schema({
   },
   workspace: {
     type: String,
-    enum: ["Trabajo", "Task manager", "Trading App", "Personal"],
+    required: [true, "Please provide a workspace for the task"]
   },
-  
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [true, "User ID is required"]
+  }
 });
 
 export default mongoose.models.Task || mongoose.model("Task", TaskSchema);

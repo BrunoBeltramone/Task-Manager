@@ -1,39 +1,92 @@
-// app/api/tasks/route.js
-import dbConnect from '../../../lib/mongodb';
-import Task from '../../../models/Task';
-
+import dbConnect from '@/lib/mongodb';
+import Task from '@/models/Task';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
 export async function GET(req) {
   await dbConnect();
-  const tasks = await Task.find({});
-  return new Response(JSON.stringify({ success: true, data: tasks }), {
-    status: 200,
-  });
+
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
+
+  try {
+    const tasks = await Task.find({ userId: session.user.id });
+    console.log(session.user.id)
+
+    return new Response(JSON.stringify(tasks), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
 }
 
 export async function POST(req) {
   await dbConnect();
-  const body = await req.json();
-  const task = await Task.create(body);
-  return new Response(JSON.stringify({ success: true, data: task }), {
-    status: 201,
-  });
-}
 
-export async function DELETE(req) {
-  await dbConnect();
-  const { id } = await req.json();
-  await Task.findByIdAndDelete(id);
-  return new Response(JSON.stringify({ success: true }), {
-    status: 200,
-  });
-}
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
 
-export async function PUT(req) {
-  await dbConnect();
-  const { id, ...updates } = await req.json(); // Obtener el ID y el resto de los datos del cuerpo de la solicitud
+  try {
+    const { title, description, state, workspace, userId, tags, conflict, priority } = await req.json();
+    console.log(title, description, state, workspace, userId, tags, conflict, priority)
+    if (!title || !description || !state || !workspace) {
+      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    }
 
-  const task = await Task.findByIdAndUpdate(id, updates, { new: true });
-  return new Response(JSON.stringify({ success: true, data: task }), {
-    status: 200,
-  });
+    const newTask = new Task({
+      title,
+      description,
+      state,
+      workspace,
+      tags,
+      conflict,
+      priority,
+      userId,
+      date: new Date(),
+    });
+
+    await newTask.save();
+
+    return new Response(JSON.stringify(newTask), {
+      status: 201,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    console.error('Error creating task:', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
 }
