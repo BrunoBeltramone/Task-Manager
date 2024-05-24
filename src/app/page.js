@@ -11,10 +11,12 @@ export default function Home() {
   const [conflict, setConflict] = useState(false);
   const [priority, setPriority] = useState("Low");
   const [tags, setTags] = useState([]);
+  const [workspace, setWorkspace] = useState("");
   const [filters, setFilters] = useState({
     status: "",
     conflict: false,
     priority: "",
+    workspace: "",
     tags: "",
     date: "", // Añadir campo de fecha
   });
@@ -34,6 +36,7 @@ export default function Home() {
       title,
       description,
       status,
+      workspace,
       conflict,
       priority,
       tags,
@@ -48,6 +51,7 @@ export default function Home() {
       setConflict(false);
       setPriority("Low");
       setTags([]);
+      setWorkspace("");
     } catch (error) {
       console.error("Error adding task:", error);
     }
@@ -92,7 +96,8 @@ export default function Home() {
       (filters.date
         ? new Date(task.date).toLocaleDateString() ===
           new Date(filters.date).toLocaleDateString()
-        : true) // Filtrar por fecha
+        : true) &&
+      (filters.workspace ? task.workspace === filters.workspace : true)
     );
   });
 
@@ -137,6 +142,22 @@ export default function Home() {
             <option value="Discard">Discard</option>
           </select>
         </div>
+        <div className="mb-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Workspace
+          </label>
+          <select
+            value={workspace}
+            onChange={(e) => setWorkspace(e.target.value)}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="Trabajo">Trabajo</option>
+            <option value="Task manager">Task manager</option>
+            <option value="Trading App">Trading App</option>
+            <option value="Personal">Personal</option>
+          </select>
+        </div>
+
         <div className="mb-2">
           <label className="block text-sm font-medium text-gray-700">
             Conflict
@@ -247,6 +268,7 @@ export default function Home() {
             placeholder="Enter tag"
           />
         </div>
+
         <div className="flex items-center space-x-2">
           <label className="block text-sm font-medium text-gray-700">
             Date
@@ -309,6 +331,20 @@ export default function Home() {
                   <option value="In Progress">In Progress</option>
                   <option value="Done">Done</option>
                   <option value="Discard">Discard</option>
+                </select>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm w-[170px] text-gray-500">
+                <select
+                  value={task.workspace}
+                  onChange={async (e) => {
+                    await updateTask(task._id, { workspace: e.target.value });
+                  }}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  <option value="Trabajo">Trabajo</option>
+                  <option value="Task manager">Task manager</option>
+                  <option value="Trading App">Trading App</option>
+                  <option value="Personal">Personal</option>
                 </select>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
