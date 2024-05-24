@@ -84,15 +84,15 @@ export default function NavbarComponent() {
         </div>
       ) : (
         <div className="flex md:order-2 space-x-3 items-center">
-          <div
-            href="#"
+          <Link
+            href="/login"
             className="mr-1 rounded-lg px-4 py-2 text-sm font-medium  focus:ring-4 "
           >
             Login
-          </div>
-          <button className="bg-gradient-to-r from-yellow-600 to-yellow-200 hover:from-yellow-200 hover:to-yellow-600 text-gray-900 font-bold py-2 px-4 rounded-xl text-sm">
+          </Link>
+          <Link href="/register" className="bg-gradient-to-r from-yellow-600 to-yellow-200 hover:from-yellow-200 hover:to-yellow-600 text-gray-900 font-bold py-2 px-4 rounded-xl text-sm">
             Sing In
-          </button>
+          </Link>
         </div>
       )}
       <Navbar.Collapse>
