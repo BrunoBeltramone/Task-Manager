@@ -1,3 +1,19 @@
-- Add new styles to the App // Later
-- Update the Description // Later
-- Add timeline field // Later
+- IDEAS NAVBAR
+
+Proyectos/Categorías:
+
+Descripción: Si tu app permite organizar tareas por proyectos o categorías, añade un enlace aquí.
+Función: Facilita la organización y el acceso rápido a diferentes conjuntos de tareas.
+Calendario:
+
+Descripción: Un acceso al calendario donde los usuarios pueden ver sus tareas programadas.
+Función: Útil para una vista global de las tareas en un formato de calendario.
+About (Acerca de):
+
+Contenido: Información sobre la app, su propósito, y el equipo de desarrollo.
+Función: Proveer contexto y credibilidad, además de posibles enlaces a redes sociales o blogs.
+
+Buscar (Search):
+
+Descripción: Una barra de búsqueda para encontrar rápidamente tareas o proyectos.
+Función: Mejora la accesibilidad y usabilidad.

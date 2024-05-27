@@ -34,7 +34,8 @@ const TaskSchema = new mongoose.Schema({
   },
   workspace: {
     type: String,
-    required: [true, "Please provide a workspace for the task"]
+    enum: ["Work", "Peexle", "Trading App", "TaskPro", "Personal"],
+    default: "Peexle"
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,

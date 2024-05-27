@@ -13,14 +13,14 @@ export default function Home() {
   const [conflict, setConflict] = useState(false);
   const [priority, setPriority] = useState("Low");
   const [tags, setTags] = useState([]);
-  const [workspace, setWorkspace] = useState("");
+  const [workspace, setWorkspace] = useState("Work");
   const [filters, setFilters] = useState({
     state: "",
     conflict: false,
     priority: "",
     workspace: "",
     tags: "",
-    date: "", // Añadir campo de fecha
+    date: "",
   });
 
   useEffect(() => {
@@ -33,15 +33,15 @@ export default function Home() {
     try {
       const response = await axios.get("/api/tasks", session.user.id, {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.accessToken}`
-        }
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`,
+        },
       });
       setTasks(response.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
-  }
+  };
 
   const addTask = async (e) => {
     e.preventDefault();
@@ -119,11 +119,17 @@ export default function Home() {
     );
   });
 
-  if (status === "Loading") return <div>Loading...</div>;
-  if (!session) return <div className="h-screen">You need to be authenticated to view this page.</div>;
+  if (status === "Loading ")
+    return <div className="min-h-screen">Loading...</div>;
+  if (!session)
+    return (
+      <div className="min-h-screen">
+        You need to be authenticated to view this page.
+      </div>
+    );
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container min-h-screen mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Task Manager</h1>
       <form onSubmit={addTask} className="mb-4">
         <div className="mb-2">
@@ -172,9 +178,10 @@ export default function Home() {
             onChange={(e) => setWorkspace(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
-            <option value="Trabajo">Trabajo</option>
-            <option value="Task manager">Task manager</option>
+            <option value="Work">Work</option>
+            <option value="Peexle">Peexle</option>
             <option value="Trading App">Trading App</option>
+            <option value="TaskPro">TaskPro</option>
             <option value="Personal">Personal</option>
           </select>
         </div>
@@ -279,6 +286,24 @@ export default function Home() {
         </div>
         <div className="flex items-center space-x-2">
           <label className="block text-sm font-medium text-gray-700">
+            Workspace
+          </label>
+          <select
+            value={filters.priority}
+            onChange={(e) =>
+              setFilters({ ...filters, workspace: e.target.value })
+            }
+            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="Work">Work</option>
+            <option value="Peexle">Peexle</option>
+            <option value="Trading App">Trading App</option>
+            <option value="TaskPro">TaskPro</option>
+            <option value="Personal">Personal</option>
+          </select>
+        </div>
+        <div className="flex items-center space-x-2">
+          <label className="block text-sm font-medium text-gray-700">
             Tags
           </label>
           <input
@@ -313,6 +338,9 @@ export default function Home() {
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               State
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Workspace
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Conflict
@@ -362,9 +390,10 @@ export default function Home() {
                   }}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 >
-                  <option value="Trabajo">Trabajo</option>
-                  <option value="Task manager">Task manager</option>
+                  <option value="Work">Work</option>
+                  <option value="Peexle">Peexle</option>
                   <option value="Trading App">Trading App</option>
+                  <option value="TaskPro">TaskPro</option>
                   <option value="Personal">Personal</option>
                 </select>
               </td>
